@@ -1,0 +1,635 @@
+/* -------------------------------------------------------------------------- 
+1\. VARIABLES DE COLORS PRINCIPALS (default tema clar) 
+-------------------------------------------------------------------------- \*/
+
+:root {
+  /* Colors de fons */
+  --bg-main: #f8fafc;
+  --bg-card: #ffffff;
+  --bg-secondary: #f1f5f9;
+  --text-primary: #0f172a;
+  --text-secondary: #475569;
+  --primary: #10b981;
+  --primary-hover: #059669;
+  --accent: #0284c7;
+  --accent-hover: #0369a1;
+  --danger: #ef4444;
+  --danger-hover: #dc2626;
+  --border-color: #e2e8f0;
+  --shadow:
+    0 4px 6px -1px rgba(0, 0, 0, 0.08), 0 2px 4px -2px rgba(0, 0, 0, 0.05);
+  --font-main:
+    system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --radius: 8px;
+}
+
+/* -------------------------------------------------------------------------- 
+   2\. variables per el tema fosc: data-theme="dark" (via JS/Cookie) 
+    -------------------------------------------------------------------------- */
+
+[data-theme="dark"] {
+  --bg-main: #0f172a; /* Fons principal fosc */
+  --bg-card: #1e293b; /* Fons de caixes i capçalera fosc */
+  --bg-secondary: #334155;
+  --text-primary: #f8fafc; /* Text clar */
+  --text-secondary: #94a3b8;
+  --primary: #34d399; /* Verd més brillant per a fons fosc */
+  --primary-hover: #10b981;
+  --accent: #38bdf8;
+  --border-color: #334155;
+  --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.4);
+}
+
+/* -------------------------------------------------------------------------- 
+3\. ESTILS BASE 
+-------------------------------------------------------------------------- */
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  background-color: var(--bg-main);
+  color: var(--text-primary);
+  font-family: var(--font-main);
+  line-height: 1.6;
+  transition:
+    background-color 0.3s ease,
+    color 0.3s ease;
+}
+
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2rem 1.5rem;
+}
+
+/* -------------------------------------------------------------------------- 
+4\. HEADER 
+-------------------------------------------------------------------------- */
+.site-header {
+  background-color: var(--bg-card);
+  border-bottom: 1px solid var(--border-color);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  box-shadow: var(--shadow);
+  transition:
+    background-color 0.3s ease,
+    border-color 0.3s ease;
+}
+
+.header-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0.8rem 1.5rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+/* Logo */
+.logo {
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  text-decoration: none;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.logo span {
+  color: var(--primary);
+}
+
+/* Menú de navegació */
+.main-nav ul {
+  list-style: none;
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+}
+
+.main-nav a {
+  color: var(--text-primary);
+  text-decoration: none;
+  font-weight: 500;
+  font-size: 0.95rem;
+  transition: color 0.2s ease;
+}
+
+.main-nav a:hover {
+  color: var(--primary);
+}
+
+/* Enllaç d'administrador */
+.nav-admin {
+  color: var(--accent) !important;
+  font-weight: 600;
+}
+
+/* Etiqueta d'usuari logat */
+.user-info {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  background-color: var(--bg-secondary);
+  padding: 0.3rem 0.8rem;
+  border-radius: 20px;
+  border: 1px solid var(--border-color);
+}
+
+/* Botó per canviar el mode clar/fosc */
+.btn-theme {
+  background: transparent;
+  border: 1px solid var(--border-color);
+  color: var(--text-primary);
+  border-radius: 50%;
+  width: 38px;
+  height: 38px;
+  cursor: pointer;
+  font-size: 1.1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition:
+    background-color 0.2s ease,
+    border-color 0.2s ease;
+}
+.btn-theme:hover {
+  background-color: var(--bg-secondary);
+}
+
+/* ========================================================================== 
+6\. LOGIN
+========================================================================== \*/
+
+/* Centra el formulari verticalment i horitzontalment a la pantalla */
+
+.site-main {
+  min-height: calc(100vh - 120px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem 1rem;
+}
+
+/* La caixa blanca/fosca del formulari \*/
+.main-container {
+  background-color: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: 2.5rem 2rem;
+  width: 100%;
+  max-width: 420px;
+  transition:
+    background-color 0.3s ease,
+    border-color 0.3s ease;
+}
+
+/* Títol del formulari \*/
+#h1-Iniciar-Sessio,
+#h1-Registrar-Sessio {
+  font-size: 1.8rem;
+  margin-bottom: 1.5rem;
+  text-align: center;
+  color: var(--text-primary);
+}
+
+#h1-Iniciar-Sessio span,
+#h1-Registrar-Sessio span {
+  color: var(--primary);
+}
+
+/* Estructura del formulari */
+.main-container form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.main-container form div {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+/* Etiquetes (labels) \*/
+#email-label,
+#password-label,
+#nom-label {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+}
+
+/* Camps d'entrada de text (input) \*/
+#email,
+#password,
+#nom {
+  width: 100%;
+  padding: 0.75rem 0.9rem;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius);
+  background-color: var(--bg-secondary);
+  color: var(--text-primary);
+  font-size: 1rem;
+  outline: none;
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+/* Efecte en fer clic/escriure dins del camp (Focus) \*/
+#email:focus,
+#password:focus {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.2);
+}
+
+/* Botó d'enviar (Iniciar Sessió) \*/
+#btn-Iniciar-Sessio,
+#btn-Registrar-Sessio {
+  background-color: var(--primary);
+  color: #ffffff;
+  border: none;
+  padding: 0.8rem;
+  border-radius: var(--radius);
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  margin-top: 0.5rem;
+  transition: background-color 0.2s ease;
+}
+#btn-Iniciar-Sessio:hover,
+#btn-Registrar-Sessio:hover {
+  background-color: var(--primary-hover);
+}
+
+/* ========================================================================== 
+7\. CATALEG
+========================================================================== \*/
+
+.vehicle-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 2rem;
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2rem 0;
+}
+
+/* La targeta del cotxe */
+.vehicle-card {
+  background-color: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: var(--shadow);
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  transition:
+    transform 0.3s ease,
+    box-shadow 0.3s ease,
+    border-color 0.3s ease;
+}
+
+/* Efecte en passar el ratolí per sobre de la targeta */
+.vehicle-card:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+}
+
+/* Contenidor per retallar i fixar la imatge en proporció 16:9 */
+.vehicle-image-container {
+  position: relative;
+  width: 100%;
+  padding-top: 56.25%;
+  background-color: var(--bg-secondary);
+  overflow: hidden;
+}
+
+/* La imatge adaptativa de fons de la targeta */
+.vehicle-image-container img {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.5s ease;
+}
+
+/* Zoom suau de la foto al fer hover */
+.vehicle-card:hover .vehicle-image-container img {
+  transform: scale(1.04);
+}
+
+/* Contenidor de tota la informació (textos i botó) */
+.vehicle-info {
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+}
+
+/* Marca del vehicle (text petit i en majúscules) */
+.vehicle-brand {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 1.2px;
+  color: var(--text-secondary);
+  font-weight: 700;
+  margin-bottom: 0.3rem;
+}
+
+/* Nom del model */
+.vehicle-model {
+  font-size: 1.35rem;
+  color: var(--text-primary);
+  font-weight: 700;
+  margin: 0 0 1rem 0;
+  line-height: 1.2;
+}
+
+/* Bloque d'etiquetes de característiques */
+.vehicle-specs {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  margin-bottom: 1.5rem;
+}
+
+/* Cada píndola de característica (places, bateria, etc.) */
+.spec-item {
+  font-size: 0.75rem;
+  background-color: var(--bg-secondary);
+  color: var(--text-secondary);
+  padding: 0.4rem 0.8rem;
+  border-radius: 20px;
+  font-weight: 500;
+  border: 1px solid var(--border-color);
+}
+
+/* Contenidor del preu */
+.vehicle-price-container {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 1.5rem;
+}
+
+/* Etiqueta de text del preu */
+.price-label {
+  font-size: 0.7rem;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 0.1rem;
+}
+
+/* Preu final en gran */
+.vehicle-price {
+  font-size: 1.6rem;
+  font-weight: 800;
+  color: var(--text-primary);
+}
+
+/* Botó d'acció "Veure detalls" */
+.btn-detalls {
+  display: inline-block;
+  text-align: center;
+  background-color: var(--primary);
+  color: #ffffff;
+  text-decoration: none;
+  padding: 0.8rem 1.5rem;
+  border-radius: var(--radius);
+  font-weight: 600;
+  font-size: 0.95rem;
+  transition:
+    background-color 0.2s ease,
+    transform 0.1s ease;
+  margin-top: auto;
+}
+
+.btn-detalls:hover {
+  background-color: var(--primary-hover);
+}
+
+.btn-detalls:active {
+  transform: scale(0.98);
+}
+
+/* ========================================================================== 
+8\. MAIN INDEX.PHP
+========================================================================== \*/
+
+/* Estils generals de la Landing */
+.landing-main {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 40px 20px;
+  font-family: sans-serif;
+  
+}
+
+/* Secció Hero */
+.hero-section {
+  text-align: center;
+  padding: 60px 20px;
+  background: linear-gradient(
+    135deg,
+    rgba(24, 210, 110, 0.1),
+    rgba(0, 150, 255, 0.1)
+  );
+  border-radius: 12px;
+  margin-bottom: 50px;
+}
+.hero-section h1 {
+  font-size: 2.5rem;
+  margin-bottom: 20px;
+}
+.hero-section h1 span {
+  color: #18d26e; /* Un verd elèctric/ecològic */
+}
+.hero-section p {
+  font-size: 1.2rem;
+  max-width: 800px;
+  margin: 0 auto 30px auto;
+  color: #555;
+}
+.btn-primary {
+  display: inline-block;
+  background-color: #18d26e;
+  color: white;
+  padding: 15px 30px;
+  border-radius: 30px;
+  text-decoration: none;
+  font-weight: bold;
+  font-size: 1.1rem;
+  transition:
+    transform 0.2s,
+    background-color 0.2s;
+}
+.btn-primary:hover {
+  background-color: #14b65e;
+  transform: scale(1.05);
+}
+
+/* Secció Característiques */
+.features-section {
+  text-align: center;
+  margin-bottom: 60px;
+}
+.features-section h2 {
+  font-size: 2rem;
+  margin-bottom: 40px;
+}
+.features-section h2 span {
+  color: #0096ff;
+}
+.features-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 30px;
+}
+.feature-card {
+  background: #f9f9f9;
+  padding: 30px;
+  border-radius: 8px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+  transition: translateY 0.2s;
+}
+.feature-card:hover {
+  transform: translateY(-5px);
+}
+.feature-icon {
+  font-size: 3rem;
+  margin-bottom: 15px;
+  background: var(--vg-card);
+}
+.feature-card h3 {
+  color:black;
+  margin-bottom: 10px;
+  font-size: 1.3rem;
+}
+
+.feature-card p{
+  color:black;
+}
+
+/* Secció d'Estadístiques */
+.stats-section {
+  background-color: #222;
+  color: white;
+  padding: 40px 20px;
+  border-radius: 12px;
+  text-align: center;
+}
+.stats-container {
+  display: flex;
+  justify-content: space-around;
+  flex-wrap: wrap;
+  gap: 20px;
+}
+.stat-number {
+  display: block;
+  font-size: 2.5rem;
+  font-weight: bold;
+  color: #18d26e;
+}
+.stat-label {
+  font-size: 1rem;
+  color: #ccc;
+}
+
+/* ========================================================================== 
+9\. FOOTER
+========================================================================== \*/
+
+.site-footer {
+  background-color: var(--bg-card);
+  border-top: 1px solid var(--border-color);
+  padding: 2.5rem 0 1rem 0;
+  margin-top: auto; /* Manté el footer a baix de tot */
+  transition:
+    background-color 0.3s ease,
+    border-color 0.3s ease;
+}
+
+/* Graella principal de 3 columnes */
+.footer-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 1.5rem;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 2rem;
+}
+
+/* Columna de la marca \*/
+.footer-brand .footer-logo {
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  text-decoration: none;
+}
+
+.footer-brand .footer-logo span {
+  color: var(--primary);
+}
+
+.footer-brand p {
+  margin-top: 0.8rem;
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+}
+
+/* Columnes d'enllaços i contacte \*/
+.footer-links h3,
+.footer-contact h3 {
+  font-size: 1rem;
+  color: var(--text-primary);
+  margin-bottom: 0.8rem;
+}
+
+.footer-links ul {
+  list-style: none;
+  padding: 0;
+}
+
+.footer-links li {
+  margin-bottom: 0.4rem;
+}
+
+.footer-links a {
+  color: var(--text-secondary);
+  text-decoration: none;
+  font-size: 0.9rem;
+  transition: color 0.2s ease;
+}
+
+.footer-links a:hover {
+  color: var(--primary);
+}
+
+.footer-contact p {
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+  margin-bottom: 0.4rem;
+}
+
+/* Línia inferior \*/
+.footer-bottom {
+  max-width: 1200px;
+  margin: 2rem auto 0 auto;
+  padding: 1rem 1.5rem 0 1.5rem;
+  border-top: 1px solid var(--border-color);
+  text-align: center;
+  color: var(--text-secondary);
+  font-size: 0.85rem;
+}
