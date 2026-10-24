@@ -1,8 +1,13 @@
 <?php
-if (session_status() === PHP_SESSION_NONE) {
-    session_start();
+require_once __DIR__ . '/session.php';
+require_once __DIR__ . '/functions.php';
+$theme = getTema();
+
+// $ruta serveix per les pagines de la carpeta admin/
+// alla abans d'incloure el header posem $ruta = "../"; perque els enllaços pugin una carpeta
+if (!isset($ruta)) {
+    $ruta = "";
 }
-$theme = $_COOKIE['theme'] ?? 'light';
 ?>
 <!DOCTYPE html>
 <html lang="ca">
@@ -11,41 +16,39 @@ $theme = $_COOKIE['theme'] ?? 'light';
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>EcoShare Girona - Vehicles Elèctrics Compartits</title>
-    <link rel="stylesheet" href="../assets/css/style.css">
-    <script src="../assets/js/main.js" defer></script>
+    <link rel="stylesheet" href="<?= $ruta ?>../assets/css/style.css">
+    <script src="<?= $ruta ?>../assets/js/main.js" defer></script>
 </head>
 
-<body data-theme="<?= htmlspecialchars($theme) ?>">
+<body data-theme="<?= e($theme) ?>">
 
     <header class="site-header">
         <div class="header-container">
-            <!-- Logo i Nom del projecte -->
-            <a href="index.php" class="logo">
+            <a href="<?= $ruta ?>index.php" class="logo">
                 ⚡ <span>EcoShare</span> Girona
             </a>
 
-            <!-- Menú de navegació -->
             <nav class="main-nav">
                 <ul>
-                    <li><a href="../public/index.php">Inici</a></li>
-                    <li><a href="../public/cataleg.php">Catàleg</a></li>
+                    <li><a href="<?= $ruta ?>index.php">Inici</a></li>
+                    <li><a href="<?= $ruta ?>cataleg.php">Catàleg</a></li>
 
-                    <?php if (isset($_SESSION['user'])): ?>
-                        <!-- Opcions per a usuaris autenticats -->
-                        <?php if ($_SESSION['user']['rol'] === 'admin'): ?>
-                            <li><a href="../public/vehicle.php" class="nav-admin">🛠️ Gestió Admin</a></li>
+                    <?php if (estaLogejat()): ?>
+                        <!-- Opcions per a usuaris -->
+                        <li><a href="<?= $ruta ?>meves_reserves.php">Les meves reserves</a></li>
+                        <?php if (esAdmin()): ?>
+                            <li><a href="<?= $ruta ?>admin/vehicles.php" class="nav-admin">🛠️ Gestió Admin</a></li>
                         <?php endif; ?>
 
-                        <li><a href="logout.php" class="btn-link">Tancar sessió</a></li>
+                        <li><a href="<?= $ruta ?>logout.php" class="btn-link">Tancar sessió</a></li>
+                        <li class="user-info">👤 <?= e($_SESSION['user']['nom']) ?></li>
                     <?php else: ?>
-                        <!-- Opcions per a visitants no logats -->
-                        <li><a href="login.php" class="btn-login">Iniciar sessió</a></li>
+                        <!-- Opcions per a visitants -->
+                        <li><a href="<?= $ruta ?>login.php" class="btn-login">Iniciar sessió</a></li>
                     <?php endif; ?>
-                    <li class="user-info">👤 <?= htmlspecialchars($_SESSION['user']['nom']) ?></li>
                 </ul>
             </nav>
 
-            <!-- Botó per canviar entre Mode Clar / Mode Fosc -->
             <button id="theme-toggle" class="btn-theme" title="Canviar tema">
                 🌙
             </button>

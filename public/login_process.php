@@ -1,8 +1,9 @@
 <?php
 // 1. Iniciem la sessió (sempre a dalt de tot)
-session_start();
+require_once '../includes/session.php';
 
 require_once '../config/db.php';
+require_once '../models/user.php';
 
 //COMPROVEM QUE ES PASSIN PER POST
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -17,22 +18,32 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 
     try {
-        // BUSQUEM PER CORREU
-        $sql = "SELECT * FROM user WHERE email = :email LIMIT 1";
-        $stmt = $pdo->prepare($sql);
-        $stmt->execute([':email' => $email]);
-        $user = $stmt->fetch();
+        // BUSQUEM PER CORREU (funcio de models/user.php)
+        $user = getUserByEmail($pdo, $email);
 
-        //verifiquem que existeixi i que la contrasenya coincideixi
+        // si no existeix l'usuari tornem al login
+        if (!$user) {
+            header("Location: login.php?error=credencials");
+            exit();
+        }
+
+        // password_verify compara la contrasenya amb el hash de la bbdd
+        if (!password_verify($password, $user['password'])) {
+            header("Location: login.php?error=credencials");
+            exit();
+        }
+
+        // canviem l'id de la sessio quan fa login (session fixation)
+        session_regenerate_id(true);
+
         $_SESSION['user'] = [
             'id' => $user['id'],
             'nom' => $user['nom'],
             'email' => $user['email'],
             'rol' => ($user['role_id'] == 1) ? 'admin' : 'user'
-            // ^ Si a la teva BDD el role_id de l'admin és un 1, aquí ho convertim al text 'admin' que busca el teu header
         ];
 
-        $_SESSION['logged_in'] = true; // Mantendim aquesta per als dominis o bloquejos de pàgina
+        $_SESSION['logged_in'] = true;
 
         // Redirigim a la pàgina principal
         header("Location: index.php");
@@ -44,7 +55,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 
 } else {
-    // Si algú intenta entrar a aquest fitxer directament sense passar pel formulari
+    // Si algú intenta entrar sense iniciar sessio
     header("Location: login.php");
     exit();
 }

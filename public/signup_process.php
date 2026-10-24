@@ -3,45 +3,43 @@
 
 
 require_once __DIR__ . '/../config/db.php';
+require_once __DIR__ . '/../models/user.php';
 
 //Comprovem que les dades s'hagin enviat per POST
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
-    $nom = trim($_POST['nom'] ?? '');
-    $email = trim($_POST['email'] ?? '');
-    $password = $_POST['password'] ?? '';
+    $nom = trim($_POST['nom']);
+    $email = trim($_POST['email']);
+    $password = $_POST['password'];
 
+    // en lloc de fer die() tornem al formulari amb l'error a la url
     if (empty($nom) || empty($email) || empty($password)) {
-        die("Si usplau, omple tots els camps obligatoris.");
+        header("Location: signup.php?error=camps_buits");
+        exit;
     }
 
-    //xifrem per hash la contrasenya
-    $password_hash = password_hash($password, PASSWORD_BCRYPT);
+    // la contrasenya ha de tenir minim 6 caracters
+    if (strlen($password) < 6) {
+        header("Location: signup.php?error=password_curta");
+        exit;
+    }
+
+    // si el correu ja existeix no el deixem registrar
+    if (getUserByEmail($pdo, $email)) {
+        header("Location: signup.php?error=correu_repetit");
+        exit;
+    }
 
     try {
-        // prepearem la consula, posem a rol_id 2 com a default que es l'usuari.
-        $sql = "INSERT INTO user (nom, email, password, role_id) VALUES (:nom, :email, :password, :role_id)";
-        $stmt = $pdo->prepare($sql);
-
-        // Executem passant els paràmetres de forma segura
-        $stmt->execute([
-            ':nom' => $nom,
-            ':email' => $email,
-            ':password' => $password_hash,
-            ':role_id' => 2
-        ]);
+        // la funcio crearUser fa el hash de la contrasenya i posa el rol 2 (usuari)
+        crearUser($pdo, $nom, $email, $password);
 
         //si tot ok s'envia a la pagina de login amb el parametre de regisre ok perque la pagina login.php sapiga que a anat tot bé.
         header("Location: login.php?registre=ok");
         exit;
 
     } catch (PDOException $e) {
-        // Si el correu ja existeix la bbdd llançara un error de uniqe.
-        if ($e->getCode() == 23000 || str_contains($e->getMessage(), 'UNIQUE')) {
-            die("Aquest correu electrònic ja està registrat.");
-        } else {
-            die("Error en registrar l'usuari: " . $e->getMessage());
-        }
+        die("Error en registrar l'usuari: " . $e->getMessage());
     }
 } else {
     //si es vol entrar sense validar ni registrar es fa fora i es rediregeix a signup.php

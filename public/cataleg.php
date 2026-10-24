@@ -1,93 +1,85 @@
 <?php
-require_once '../includes/header.php'; // Carga el header
-if (!isset($_SESSION['logged_in']) || $_SESSION['logged_in'] !== true) {
-    header("Location: login.php");
-    exit();
-}
+// la sessio es comprova abans del header, perque si ja s'ha enviat html el header("Location") no funciona
+// comprovem que hagi fet login (funcio de includes/session.php)
+require_once '../includes/session.php';
+comprovarLogin();
 
-// 1. Importamos tu conexión ya existente
-// (Asegúrate de que en db.php tu variable de conexión se llame $db o $conn)
 require_once '../config/db.php';
+require_once '../models/vehicle.php';
 
-// 2. Comprobar si el usuario ha hecho clic en algún filtro de categoría
-$categoria_filtrada = isset($_GET['categoria']) ? $_GET['categoria'] : '';
+// mirem si s'ha clicat algun filtre (cataleg.php?tipus=1)
+$tipus_filtrat = 0;
+if (isset($_GET['tipus'])) {
+    $tipus_filtrat = (int) $_GET['tipus'];
+}
 
 try {
-    // 3. Preparar la consulta según el filtro (reutilizando tu conexión $db)
-    if (!empty($categoria_filtrada)) {
-        $sql = "SELECT * FROM vehicles WHERE categoria = :categoria";
-        $stmt = $pdo->prepare($sql);
-        $stmt->bindValue(':categoria', $categoria_filtrada, PDO::PARAM_STR);
-    } else {
-        $sql = "SELECT * FROM vehicles";
-        $stmt = $pdo->prepare($sql);
-    }
+    // les funcions son de models/vehicle.php
+    // si $tipus_filtrat es 0 retorna tots els vehicles
+    $vehicles = getVehicles($pdo, $tipus_filtrat);
 
-    $stmt->execute();
-    $vehicles = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    // els tipus per fer els botons del filtre
+    $tipus_vehicles = getTipus($pdo);
 
 } catch (PDOException $e) {
-    die("Error al consultar la base de datos: " . $e->getMessage());
+    die("Error en consultar la base de dades: " . $e->getMessage());
 }
+
+require_once '../includes/header.php';
 ?>
 
 <main class="site-main">
-    <!-- Botones de filtro adaptados a tus archivos actuales -->
-    <!-- <div class="filter-buttons" style="margin-bottom: 20px; text-align: center;">
-        <a href="cataleg.php" class="btn-filtre">Todos</a>
-        <a href="cataleg.php?categoria=cotxe" class="btn-filtre">Coches</a>
-        <a href="cataleg.php?categoria=bicicleta" class="btn-filtre">Bicicletas</a>
-        <a href="cataleg.php?categoria=moto" class="btn-filtre">Motos</a>
-    </div>-->
+
+    <!-- botons per filtrar per tipus -->
+    <div class="filter-buttons">
+        <a href="cataleg.php" class="btn-filtre">Tots</a>
+        <?php foreach ($tipus_vehicles as $t): ?>
+            <a href="cataleg.php?tipus=<?= $t['id'] ?>" class="btn-filtre"><?= e($t['nom']) ?></a>
+        <?php endforeach; ?>
+    </div>
 
     <div class="vehicle-container">
-        <?php if (count($vehicles) > 0): ?>
-            <?php foreach ($vehicles as $vehicle): ?>
-                <card class="vehicle-card">
-                    <div class="vehicle-image-container">
-                        <!-- Corregimos la ruta dinámicamente apuntando a tu carpeta assets -->
-                        <img src="../assets/img/<?php echo htmlspecialchars($vehicle['imatge_url']); ?>"
-                            alt="<?php echo htmlspecialchars($vehicle['marca'] . ' ' . $vehicle['model']); ?>"
-                            class="vehicle-img">
-                    </div>
-
-                    <div class="vehicle-info">
-                        <span class="vehicle-brand"><?php echo htmlspecialchars($vehicle['marca']); ?></span>
-                        <h2 class="vehicle-model"><?php echo htmlspecialchars($vehicle['model']); ?></h2>
-
-                        <div class="vehicle-specs">
-                            <?php if (!empty($vehicle['etiqueta'])): ?>
-                                <span class="spec-item">Etiqueta <?php echo htmlspecialchars($vehicle['etiqueta']); ?></span>
-                            <?php endif; ?>
-
-                            <?php if (!empty($vehicle['autonomia_electrica'])): ?>
-                                <span class="spec-item"><?php echo htmlspecialchars($vehicle['autonomia_electrica']); ?>
-                                    Autonomía</span>
-                            <?php endif; ?>
-
-                            <?php if (!empty($vehicle['maleter'])): ?>
-                                <span class="spec-item"><?php echo htmlspecialchars($vehicle['maleter']); ?> Maletero</span>
-                            <?php endif; ?>
-
-                            <?php if (!empty($vehicle['tipus'])): ?>
-                                <span class="spec-item"><?php echo htmlspecialchars($vehicle['tipus']); ?></span>
-                            <?php endif; ?>
-                        </div>
-
-                        <div class="vehicle-price-container">
-                            <span class="price-label">Precio al contado</span>
-                            <span class="vehicle-price"><?php echo htmlspecialchars($vehicle['preu_text']); ?></span>
-                        </div>
-
-                        <a href="<?php echo htmlspecialchars($vehicle['detalls_url']); ?>" class="btn-detalls" target="_blank"
-                            rel="noopener noreferrer">Ver detalles del modelo</a>
-                    </div>
-                </card>
-            <?php endforeach; ?>
-        <?php else: ?>
-            <p style="text-align: center; width: 100%;">No se ha encontrado ningún vehículo en esta categoría.</p>
+        <?php if (count($vehicles) == 0): ?>
+            <p>No s'ha trobat cap vehicle d'aquest tipus.</p>
         <?php endif; ?>
+
+        <?php foreach ($vehicles as $vehicle): ?>
+            <article class="vehicle-card">
+                <div class="vehicle-image-container">
+                    <img src="../assets/img/<?= e($vehicle['imatge_url']) ?>" alt="<?= e($vehicle['marca']) ?>" class="vehicle-img">
+                </div>
+
+                <div class="vehicle-info">
+                    <span class="vehicle-brand"><?= e($vehicle['marca']) ?></span>
+                    <h2 class="vehicle-model"><?= e($vehicle['model']) ?></h2>
+
+                    <div class="vehicle-specs">
+                        <span class="spec-item"><?= e($vehicle['tipus']) ?></span>
+
+                        <!-- l'etiqueta pot ser "0" (zero emissions) per aixo no fem servir empty() -->
+                        <?php if ($vehicle['etiqueta'] != "" && $vehicle['etiqueta'] != "No cal"): ?>
+                            <span class="spec-item">Etiqueta <?= e($vehicle['etiqueta']) ?></span>
+                        <?php endif; ?>
+
+                        <?php if ($vehicle['autonomia_electrica'] > 0): ?>
+                            <span class="spec-item"><?= e($vehicle['autonomia_electrica']) ?> km d'autonomia</span>
+                        <?php endif; ?>
+
+                        <?php if ($vehicle['maleter'] > 0): ?>
+                            <span class="spec-item"><?= e($vehicle['maleter']) ?> L de maleter</span>
+                        <?php endif; ?>
+                    </div>
+
+                    <div class="vehicle-price-container">
+                        <span class="price-label">Preu</span>
+                        <span class="vehicle-price"><?= e($vehicle['preu_text']) ?></span>
+                    </div>
+
+                    <a href="vehicle_detail.php?id=<?= $vehicle['id'] ?>" class="btn-detalls">Veure i reservar</a>
+                </div>
+            </article>
+        <?php endforeach; ?>
     </div>
 </main>
 
-<?php require_once '../includes/footer.php'; // Carga el footer ?>
+<?php require_once '../includes/footer.php'; ?>

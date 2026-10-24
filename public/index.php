@@ -1,19 +1,15 @@
 <?php
-session_start();
+// si no ha fet login el porta a login.php (funcio de includes/session.php)
+require_once '../includes/session.php';
+comprovarLogin();
 
-// si no hi ha la variable logged
-if (!isset($_SESSION['logged_in']) || $_SESSION['logged_in'] !== true) {
-    // Redirigim l'usuari cap a la pàgina de login
-    header("Location: login.php");
-    exit(); // aturem la execucio.
-}
 require_once '../includes/header.php'; // Carrega el header dins del context d'index.php ?>
 <main class="landing-main">
 
     <!-- 1. Benvinguda principal -->
     <section class="hero-section">
         <div class="hero-content">
-            <h1>Hola, <span><?= htmlspecialchars($_SESSION['user']['nom'] ?? 'Usuari/a') ?></span>! Benvingut/da a
+            <h1>Hola, <span><?= e($_SESSION['user']['nom'] ?? 'Usuari/a') ?></span>! Benvingut/da a
                 EcoShare Girona</h1>
             <p>La plataforma de mobilitat sostenible i vehicles elèctrics compartits de la teva ciutat. Mou-te de manera
                 neta, ràpida i sense complicacions.</p>
